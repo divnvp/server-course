@@ -4,21 +4,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import ru.mip.database.models.Groups;
+import ru.mip.database.models.Role;
 import ru.mip.database.models.Students;
-import ru.mip.database.models.Users;
-import ru.mip.database.repositories.GroupsRepository;
-import ru.mip.database.repositories.StudentsRepository;
+import ru.mip.database.models.User;
 import ru.mip.database.services.GroupsService;
+import ru.mip.database.services.RoleService;
 import ru.mip.database.services.StudentsService;
-import ru.mip.database.services.UsersService;
+import ru.mip.database.services.UserService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Random;
 
 @Component
 public class GroupsConfiguration implements CommandLineRunner {
@@ -30,6 +29,11 @@ public class GroupsConfiguration implements CommandLineRunner {
 
     @Autowired
     private StudentsService studentsService;
+
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
     private final String[] className = new String[]{
             "3A", "3B", "3C"
@@ -70,22 +74,22 @@ public class GroupsConfiguration implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-            Groups groups = new Groups(
-                    className[0],
-                    faculty[0]
-            );
+        Groups groups = new Groups(
+                className[0],
+                faculty[0]
+        );
         groupsService.save(groups);
 
-            Groups groups1 = new Groups(
-                    className[1],
-                    faculty[1]
-            );
+        Groups groups1 = new Groups(
+                className[1],
+                faculty[1]
+        );
         groupsService.save(groups1);
 
         Groups groups2 = new Groups(
-                    className[2],
-                    faculty[2]
-            );
+                className[2],
+                faculty[2]
+        );
         groupsService.save(groups2);
 
         Students students = new Students(
@@ -112,9 +116,19 @@ public class GroupsConfiguration implements CommandLineRunner {
                 sex[0]
         );
 
-            studentsService.save(students);
-            studentsService.save(students1);
-            studentsService.save(students2);
-        }
+        studentsService.save(students);
+        studentsService.save(students1);
+        studentsService.save(students2);
+
+        Role adminRole = new Role();
+        adminRole.setName("ADMIN");
+        roleService.save(adminRole);
+
+        User admin = new User();
+        admin.setUsername("admin");
+        admin.setPassword("admin");
+        admin.setRoles(Collections.singleton(adminRole));
+        userService.saveUser(admin);
+    }
 }
 
